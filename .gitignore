@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.venv/
+bank.db-shm
+bank.db-wal
+.streamlit/secrets.toml

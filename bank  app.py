@@ -1,7 +1,6 @@
 import streamlit as st
 import sqlite3
 import hashlib
-import os
 from datetime import datetime
 from sklearn.ensemble import RandomForestClassifier
 
@@ -23,11 +22,8 @@ st.set_page_config(
 
 conn = sqlite3.connect(
     "bank.db",
-    timeout=30,
     check_same_thread=False
 )
-conn.execute("PRAGMA journal_mode=WAL;")
-conn.execute("PRAGMA busy_timeout = 30000;")
 
 cursor = conn.cursor()
 
@@ -829,41 +825,50 @@ elif page == "Fraud Check":
         use_container_width=True
     ):
 
-        prediction = fraud_model.predict([
-            [
-                amount,
-                transaction_count,
-                account_age
-            ]
-        ])
-
-        probability = fraud_model.predict_proba([
-            [
-                amount,
-                transaction_count,
-                account_age
-            ]
-        ])[0][1]
-
-
-        if prediction[0] == 1:
+        if fraud_model is None:
 
             st.error(
-                "⚠️ Transaction classified as suspicious."
-            )
-
-            st.write(
-                f"Estimated risk: "
-                f"*{probability * 100:.1f}%*"
+                "bank_model.joblib was not found. "
+                "Run model.py first."
             )
 
         else:
 
-            st.success(
-                "✅ Transaction classified as normal."
-            )
+            prediction = fraud_model.predict([
+                [
+                    amount,
+                    transaction_count,
+                    account_age
+                ]
+            ])
 
-            st.write(
-                f"Estimated risk: "
-                f"*{probability * 100:.1f}%*"
-            )
+            probability = fraud_model.predict_proba([
+                [
+                    amount,
+                    transaction_count,
+                    account_age
+                ]
+            ])[0][1]
+
+
+            if prediction[0] == 1:
+
+                st.error(
+                    "⚠️ Transaction classified as suspicious."
+                )
+
+                st.write(
+                    f"Estimated risk: "
+                    f"*{probability * 100:.1f}%*"
+                )
+
+            else:
+
+                st.success(
+                    "✅ Transaction classified as normal."
+                )
+
+                st.write(
+                    f"Estimated risk: "
+                    f"*{probability * 100:.1f}%*"
+                )

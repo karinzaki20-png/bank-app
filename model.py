@@ -1,20 +1,38 @@
 from pathlib import Path
-import runpy
+
 import joblib
-import os
+from sklearn.ensemble import RandomForestClassifier
 
 
-def main():
-    script_path = Path(__file__).resolve().with_name("bank model.py")
+MODEL_PATH = Path(__file__).resolve().parent / "bank_model.joblib"
 
-    if not script_path.exists():
-        raise FileNotFoundError(
-            "Missing training script: 'bank model.py'. "
-            "Please keep the model generator file in the project folder."
-        )
+# Features:
+# transaction_amount
+# transaction_count
+# account_age_days
 
-    runpy.run_path(str(script_path), run_name="__main__")
+X = [
+    [100, 2, 500],
+    [200, 3, 800],
+    [500, 5, 1000],
+    [1000, 10, 1500],
+    [5000, 30, 2000],
+    [10000, 50, 100],
+    [15000, 60, 50],
+    [20000, 80, 30],
+]
 
+# 0 = normal
+# 1 = suspicious
+y = [0, 0, 0, 0, 0, 1, 1, 1]
 
-if __name__ == "__main__":
-    main()
+model = RandomForestClassifier(
+    n_estimators=100,
+    random_state=42
+)
+
+model.fit(X, y)
+
+joblib.dump(model, MODEL_PATH)
+
+print(f"Model created successfully at {MODEL_PATH}")
