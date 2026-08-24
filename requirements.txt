@@ -3,6 +3,3 @@ joblib
 scikit-learn
 pandas
 numpy
-model.py
-app.py
-bank model.py
